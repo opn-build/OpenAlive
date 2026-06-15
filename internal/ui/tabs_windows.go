@@ -155,8 +155,12 @@ func (w *Window) settingsPage() TabPage {
 				w.labelTr("settings.lang_label"), ComboBox{AssignTo: &w.langCombo, Model: langLabels},
 			),
 			w.groupTr("settings.behavior", VBox{},
-				w.checkTr(&w.minimize, "settings.minimize", nil),
 				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+					HSpacer{},
+					w.checkTr(&w.minimize, "settings.minimize", nil),
+				}},
+				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+					HSpacer{},
 					w.checkTr(&w.autostart, "settings.autostart", nil),
 					w.checkTr(&w.startActive, "settings.start_active", nil),
 				}},
@@ -170,9 +174,13 @@ func (w *Window) settingsPage() TabPage {
 
 func (w *Window) supportPage() TabPage {
 	var page *walk.TabPage
+	var titleLbl *walk.Label
 	w.addRetranslator(func() {
 		if page != nil {
 			_ = page.SetTitle(i18n.T("tab.support"))
+		}
+		if titleLbl != nil {
+			_ = titleLbl.SetText(i18n.T("support.title"))
 		}
 	})
 	return TabPage{
@@ -180,10 +188,22 @@ func (w *Window) supportPage() TabPage {
 		Title:    i18n.T("tab.support"),
 		Layout:   VBox{},
 		Children: []Widget{
-			w.labelTr("support.title"),
+			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+				HSpacer{},
+				Label{Text: "☕"},
+				HSpacer{},
+			}},
+			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+				HSpacer{},
+				Label{AssignTo: &titleLbl, Text: i18n.T("support.title")},
+				HSpacer{},
+			}},
 			w.labelTr("support.body"),
-			w.buttonTr(new(*walk.PushButton), "support.donate_btn", func() { openURL(paypalURL) }),
-			Label{Text: paypalURL},
+			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+				HSpacer{},
+				w.buttonTr(new(*walk.PushButton), "support.donate_btn", func() { openURL(paypalURL) }),
+				HSpacer{},
+			}},
 			VSpacer{},
 		},
 	}
