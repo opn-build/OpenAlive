@@ -72,7 +72,7 @@ Write-Host "    Releases\$Version\OpenAlive_Setup_v$Version.exe OK" -ForegroundC
 
 # ── 4. Optional GitHub release (asks; default No) ───────────────────────────
 Write-Host "[4/4] GitHub release (optional)..." -ForegroundColor Yellow
-$ReleaseRepo = "opn-build/OpenAlive-Releases"
+$ReleaseRepo = "opn-build/OpenAlive"
 $answer = Read-Host "    Create GitHub release v$Version on $ReleaseRepo and upload the installer? (y/N)"
 if ($answer -match '^(y|Y)') {
     $gh = Get-Command gh -ErrorAction SilentlyContinue
