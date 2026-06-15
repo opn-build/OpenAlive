@@ -1,0 +1,28 @@
+# User config (runtime, not source)
+config.json
+
+# Build artifacts
+build/
+dist/
+*.spec
+
+# Releases (binaries)
+Releases/
+installer/Output/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Agent/memory workspaces
+exclude/
+.atl/
+.claude/
