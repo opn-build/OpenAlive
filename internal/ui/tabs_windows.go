@@ -96,7 +96,10 @@ func (w *Window) schedulePage() TabPage {
 		Title:    i18n.T("tab.schedule"),
 		Layout:   VBox{},
 		Children: []Widget{
-			w.checkTr(&w.schedEnable, "schedule.master_toggle", nil),
+			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+				w.checkTr(&w.schedEnable, "schedule.master_toggle", nil),
+				HSpacer{},
+			}},
 			w.groupTr("schedule.work_hours", HBox{},
 				w.labelTr("schedule.start"),
 				LineEdit{AssignTo: &w.workStart, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
@@ -104,7 +107,10 @@ func (w *Window) schedulePage() TabPage {
 				LineEdit{AssignTo: &w.workEnd, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
 			),
 			w.groupTr("schedule.lunch_section", VBox{},
-				w.checkTr(&w.lunchEnable, "schedule.lunch_toggle", nil),
+				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+					w.checkTr(&w.lunchEnable, "schedule.lunch_toggle", nil),
+					HSpacer{},
+				}},
 				Composite{
 					Layout: HBox{},
 					Children: []Widget{
@@ -159,6 +165,7 @@ func (w *Window) settingsPage() TabPage {
 				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 					w.checkTr(&w.autostart, "settings.autostart", nil),
 					w.checkTr(&w.startActive, "settings.start_active", nil),
+					HSpacer{},
 				}},
 			),
 			w.buttonTr(new(*walk.PushButton), "settings.save_btn", func() { w.saveSettings() }),
@@ -171,7 +178,7 @@ func (w *Window) settingsPage() TabPage {
 func (w *Window) supportPage() TabPage {
 	var page *walk.TabPage
 	var titleLbl *walk.Label
-	var bodyLbl *walk.Label
+	var bodyLnk *walk.LinkLabel
 	w.addRetranslator(func() {
 		if page != nil {
 			_ = page.SetTitle(i18n.T("tab.support"))
@@ -179,8 +186,8 @@ func (w *Window) supportPage() TabPage {
 		if titleLbl != nil {
 			_ = titleLbl.SetText(i18n.T("support.title"))
 		}
-		if bodyLbl != nil {
-			_ = bodyLbl.SetText(i18n.T("support.body"))
+		if bodyLnk != nil {
+			_ = bodyLnk.SetText(i18n.T("support.body"))
 		}
 	})
 	return TabPage{
@@ -191,18 +198,15 @@ func (w *Window) supportPage() TabPage {
 			VSpacer{},
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 				HSpacer{},
-				Label{Text: "☕"},
-				HSpacer{},
-			}},
-			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
-				HSpacer{},
 				Label{AssignTo: &titleLbl, Text: i18n.T("support.title")},
 				HSpacer{},
 			}},
-			Label{
-				AssignTo:      &bodyLbl,
-				Text:          i18n.T("support.body"),
-				TextAlignment: AlignCenter,
+			LinkLabel{
+				AssignTo: &bodyLnk,
+				Text:     i18n.T("support.body"),
+				OnLinkActivated: func(link *walk.LinkLabelLink) {
+					openURL(link.URL())
+				},
 			},
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 				HSpacer{},
