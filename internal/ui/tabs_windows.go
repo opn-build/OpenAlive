@@ -90,6 +90,12 @@ func (w *Window) schedulePage() TabPage {
 		if page != nil {
 			_ = page.SetTitle(i18n.T("tab.schedule"))
 		}
+		if w.workHoursGroup != nil {
+			_ = w.workHoursGroup.SetTitle(i18n.T("schedule.work_hours"))
+		}
+		if w.lunchSectionGroup != nil {
+			_ = w.lunchSectionGroup.SetTitle(i18n.T("schedule.lunch_section"))
+		}
 	})
 	return TabPage{
 		AssignTo: &page,
@@ -97,30 +103,41 @@ func (w *Window) schedulePage() TabPage {
 		Layout:   VBox{},
 		Children: []Widget{
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
-				w.checkTr(&w.schedEnable, "schedule.master_toggle", nil),
+				w.checkTr(&w.schedEnable, "schedule.master_toggle", func() { w.syncScheduleEnabled() }),
 				HSpacer{},
 			}},
-			w.groupTr("schedule.work_hours", HBox{},
-				w.labelTr("schedule.start"),
-				LineEdit{AssignTo: &w.workStart, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
-				w.labelTr("schedule.end"),
-				LineEdit{AssignTo: &w.workEnd, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
-			),
-			w.groupTr("schedule.lunch_section", VBox{},
-				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
-					w.checkTr(&w.lunchEnable, "schedule.lunch_toggle", nil),
-					HSpacer{},
-				}},
-				Composite{
-					Layout: HBox{},
-					Children: []Widget{
-						w.labelTr("schedule.start"),
-						LineEdit{AssignTo: &w.lunchStart, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
-						w.labelTr("schedule.end"),
-						LineEdit{AssignTo: &w.lunchEnd, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
+			GroupBox{
+				AssignTo: &w.workHoursGroup,
+				Title:    i18n.T("schedule.work_hours"),
+				Layout:   HBox{},
+				Children: []Widget{
+					w.labelTr("schedule.start"),
+					LineEdit{AssignTo: &w.workStart, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
+					w.labelTr("schedule.end"),
+					LineEdit{AssignTo: &w.workEnd, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
+				},
+			},
+			GroupBox{
+				AssignTo: &w.lunchSectionGroup,
+				Title:    i18n.T("schedule.lunch_section"),
+				Layout:   VBox{},
+				Children: []Widget{
+					Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+						w.checkTr(&w.lunchEnable, "schedule.lunch_toggle", func() { w.syncLunchEnabled() }),
+						HSpacer{},
+					}},
+					Composite{
+						AssignTo: &w.lunchTimeComposite,
+						Layout:   HBox{},
+						Children: []Widget{
+							w.labelTr("schedule.start"),
+							LineEdit{AssignTo: &w.lunchStart, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
+							w.labelTr("schedule.end"),
+							LineEdit{AssignTo: &w.lunchEnd, MaxLength: 5, MinSize: Size{Width: 50}, MaxSize: Size{Width: 70}},
+						},
 					},
 				},
-			),
+			},
 			w.buttonTr(new(*walk.PushButton), "schedule.save_btn", func() { w.saveSchedule() }),
 			Label{AssignTo: &w.schedMsg, Text: ""},
 			VSpacer{},
@@ -153,7 +170,7 @@ func (w *Window) settingsPage() TabPage {
 				NumberEdit{AssignTo: &w.interval, Decimals: 0, MinValue: 5, MaxValue: 3600, MaxSize: Size{Width: 70}},
 			),
 			w.groupTr("settings.keyboard", HBox{},
-				w.checkTr(&w.keyEnable, "settings.key_toggle", nil),
+				w.checkTr(&w.keyEnable, "settings.key_toggle", func() { w.syncKeyEnabled() }),
 				w.labelTr("settings.key_label"),
 				ComboBox{AssignTo: &w.keyCombo, Model: keyOptions},
 			),
@@ -161,7 +178,10 @@ func (w *Window) settingsPage() TabPage {
 				w.labelTr("settings.lang_label"), ComboBox{AssignTo: &w.langCombo, Model: langLabels},
 			),
 			w.groupTr("settings.behavior", VBox{},
-				w.checkTr(&w.minimize, "settings.minimize", nil),
+				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+					w.checkTr(&w.minimize, "settings.minimize", nil),
+					HSpacer{},
+				}},
 				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 					w.checkTr(&w.autostart, "settings.autostart", nil),
 					w.checkTr(&w.startActive, "settings.start_active", nil),
@@ -201,13 +221,17 @@ func (w *Window) supportPage() TabPage {
 				Label{AssignTo: &titleLbl, Text: i18n.T("support.title")},
 				HSpacer{},
 			}},
-			LinkLabel{
-				AssignTo: &bodyLnk,
-				Text:     i18n.T("support.body"),
-				OnLinkActivated: func(link *walk.LinkLabelLink) {
-					openURL(link.URL())
+			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
+				HSpacer{},
+				LinkLabel{
+					AssignTo: &bodyLnk,
+					Text:     i18n.T("support.body"),
+					OnLinkActivated: func(link *walk.LinkLabelLink) {
+						openURL(link.URL())
+					},
 				},
-			},
+				HSpacer{},
+			}},
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 				HSpacer{},
 				ImageView{
@@ -254,6 +278,9 @@ func (w *Window) loadValues() {
 	w.minimize.SetChecked(c.MinimizeOnClose)
 	w.autostart.SetChecked(c.StartWithWindows)
 	w.startActive.SetChecked(c.StartActive)
+
+	w.syncKeyEnabled()
+	w.syncScheduleEnabled()
 }
 
 // saveSchedule validates and persists the schedule tab; returns false (and shows

@@ -93,6 +93,11 @@ type Window struct {
 	startActive *walk.CheckBox
 	setMsg      *walk.Label
 
+	// schedule tab — groups tracked for enable/disable
+	workHoursGroup    *walk.GroupBox
+	lunchSectionGroup *walk.GroupBox
+	lunchTimeComposite *walk.Composite
+
 	// support tab
 	paypalBitmap *walk.Bitmap
 	paypalView   *walk.ImageView
@@ -486,11 +491,36 @@ func (w *Window) updateScheduleSummary() {
 		_ = w.scheduleSummLbl.SetText("")
 		return
 	}
-	summary := fmt.Sprintf("Work %s–%s", c.WorkStart, c.WorkEnd)
+	summary := fmt.Sprintf("%s %s–%s", i18n.T("sched.label_work"), c.WorkStart, c.WorkEnd)
 	if c.LunchEnabled {
-		summary += fmt.Sprintf(" · Lunch %s–%s", c.LunchStart, c.LunchEnd)
+		summary += fmt.Sprintf(" · %s %s–%s", i18n.T("sched.label_lunch"), c.LunchStart, c.LunchEnd)
 	}
 	_ = w.scheduleSummLbl.SetText(summary)
+}
+
+func (w *Window) syncKeyEnabled() {
+	if w.keyCombo != nil {
+		w.keyCombo.SetEnabled(w.keyEnable.Checked())
+	}
+}
+
+func (w *Window) syncScheduleEnabled() {
+	on := w.schedEnable.Checked()
+	if w.workHoursGroup != nil {
+		w.workHoursGroup.SetEnabled(on)
+	}
+	if w.lunchSectionGroup != nil {
+		w.lunchSectionGroup.SetEnabled(on)
+		if on {
+			w.syncLunchEnabled()
+		}
+	}
+}
+
+func (w *Window) syncLunchEnabled() {
+	if w.lunchTimeComposite != nil {
+		w.lunchTimeComposite.SetEnabled(w.lunchEnable.Checked())
+	}
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
