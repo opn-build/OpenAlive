@@ -155,12 +155,8 @@ func (w *Window) settingsPage() TabPage {
 				w.labelTr("settings.lang_label"), ComboBox{AssignTo: &w.langCombo, Model: langLabels},
 			),
 			w.groupTr("settings.behavior", VBox{},
+				w.checkTr(&w.minimize, "settings.minimize", nil),
 				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
-					HSpacer{},
-					w.checkTr(&w.minimize, "settings.minimize", nil),
-				}},
-				Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
-					HSpacer{},
 					w.checkTr(&w.autostart, "settings.autostart", nil),
 					w.checkTr(&w.startActive, "settings.start_active", nil),
 				}},
@@ -175,6 +171,7 @@ func (w *Window) settingsPage() TabPage {
 func (w *Window) supportPage() TabPage {
 	var page *walk.TabPage
 	var titleLbl *walk.Label
+	var bodyLbl *walk.Label
 	w.addRetranslator(func() {
 		if page != nil {
 			_ = page.SetTitle(i18n.T("tab.support"))
@@ -182,12 +179,16 @@ func (w *Window) supportPage() TabPage {
 		if titleLbl != nil {
 			_ = titleLbl.SetText(i18n.T("support.title"))
 		}
+		if bodyLbl != nil {
+			_ = bodyLbl.SetText(i18n.T("support.body"))
+		}
 	})
 	return TabPage{
 		AssignTo: &page,
 		Title:    i18n.T("tab.support"),
 		Layout:   VBox{},
 		Children: []Widget{
+			VSpacer{},
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 				HSpacer{},
 				Label{Text: "☕"},
@@ -198,10 +199,24 @@ func (w *Window) supportPage() TabPage {
 				Label{AssignTo: &titleLbl, Text: i18n.T("support.title")},
 				HSpacer{},
 			}},
-			w.labelTr("support.body"),
+			Label{
+				AssignTo:      &bodyLbl,
+				Text:          i18n.T("support.body"),
+				TextAlignment: AlignCenter,
+			},
 			Composite{Layout: HBox{MarginsZero: true}, Children: []Widget{
 				HSpacer{},
-				w.buttonTr(new(*walk.PushButton), "support.donate_btn", func() { openURL(paypalURL) }),
+				ImageView{
+					AssignTo: &w.paypalView,
+					Image:    w.paypalBitmap,
+					MinSize:  Size{Width: 96, Height: 20},
+					MaxSize:  Size{Width: 96, Height: 20},
+					OnMouseUp: func(x, y int, button walk.MouseButton) {
+						if button == walk.LeftButton {
+							openURL(paypalURL)
+						}
+					},
+				},
 				HSpacer{},
 			}},
 			VSpacer{},

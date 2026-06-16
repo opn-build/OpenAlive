@@ -21,6 +21,15 @@ func AppIcon() image.Image {
 	return img
 }
 
+//go:embed paypal_donate.png
+var paypalPNG []byte
+
+// PaypalDonate returns the PayPal donate button image.
+func PaypalDonate() image.Image {
+	img, _ := png.Decode(bytes.NewReader(paypalPNG))
+	return img
+}
+
 // State colors match the badge: green / orange / red.
 var palette = map[string]color.RGBA{
 	"active":   {39, 174, 96, 255},

@@ -93,11 +93,20 @@ type Window struct {
 	startActive *walk.CheckBox
 	setMsg      *walk.Label
 
+	// support tab
+	paypalBitmap *walk.Bitmap
+	paypalView   *walk.ImageView
 }
 
 // New builds and creates the main window (initially hidden).
 func New(deps Deps) (*Window, error) {
 	w := &Window{deps: deps, done: make(chan struct{})}
+
+	if img := icons.PaypalDonate(); img != nil {
+		if bmp, err := walk.NewBitmapFromImage(img); err == nil {
+			w.paypalBitmap = bmp
+		}
+	}
 
 	if err := (MainWindow{
 		AssignTo: &w.mw,
@@ -214,6 +223,11 @@ func (w *Window) wireEvents() {
 			w.deps.OnQuit()
 		}
 	})
+
+	w.statusBadge.SetCursor(walk.CursorHand())
+	if w.paypalView != nil {
+		w.paypalView.SetCursor(walk.CursorHand())
+	}
 
 	w.statusBadge.MouseUp().Attach(func(x, y int, button walk.MouseButton) {
 		if button != walk.LeftButton {
