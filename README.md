@@ -83,3 +83,11 @@ go vet ./...
 ## License
 
 [GNU General Public License v3.0](LICENSE)
+
+---
+
+<p align="center">
+  <a href="https://www.paypal.com/paypalme/fcapuz/1">
+    <img src="assets/paypal_donate.png" alt="Donate via PayPal" />
+  </a>
+</p>
