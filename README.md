@@ -27,9 +27,9 @@ No installation of runtimes required. Single `.exe`, ~6 MB, ~5–15 MB of RAM at
 ## Screenshots
 
 <p align="center">
-  <img src="https://opn-build.github.io/images/01-status.png" width="320" alt="Status tab" />
-  <img src="https://opn-build.github.io/images/02-schedule.png" width="320" alt="Schedule tab" />
-  <img src="https://opn-build.github.io/images/03-settings.png" width="320" alt="Settings tab" />
+  <img src="https://opn-build.github.io/images/01-status.jpg" width="320" alt="Status tab" />
+  <img src="https://opn-build.github.io/images/02-schedule.jpg" width="320" alt="Schedule tab" />
+  <img src="https://opn-build.github.io/images/03-settings.jpg" width="320" alt="Settings tab" />
 </p>
 
 ---
