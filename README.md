@@ -86,6 +86,8 @@ go vet ./...
 
 ---
 
+## Donate ❤️
+
 <p align="center">
   <a href="https://www.paypal.com/paypalme/fcapuz">
     <img src="assets/paypal_donate.png" alt="Donate via PayPal" />
