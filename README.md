@@ -24,6 +24,16 @@ No installation of runtimes required. Single `.exe`, ~6 MB, ~5–15 MB of RAM at
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="https://opn-build.github.io/images/01-status.png" width="320" alt="Status tab" />
+  <img src="https://opn-build.github.io/images/02-schedule.png" width="320" alt="Schedule tab" />
+  <img src="https://opn-build.github.io/images/03-settings.png" width="320" alt="Settings tab" />
+</p>
+
+---
+
 ## Download
 
 Get the latest installer from the [Releases](https://github.com/opn-build/OpenAlive/releases) page.
@@ -50,30 +60,14 @@ The tray icon changes color to show the current state at a glance. Right-clickin
 ## Build
 
 <details>
-<summary>Build from source</summary>
+<summary>Build from source (Linux / WSL)</summary>
 
 The exe cross-compiles from Linux/WSL — no C toolchain required.
-
-### From WSL / Linux
 
 ```bash
 GOOS=windows GOARCH=amd64 go build -ldflags "-H windowsgui -s -w" \
   -o build/OpenAlive.exe ./cmd/openalive
 ```
-
-Then compile the installer on Windows without rebuilding the exe:
-
-```powershell
-.\build.ps1 -SkipBuild
-```
-
-### From Windows
-
-```powershell
-.\build.ps1
-```
-
-`build.ps1` builds the exe, compiles the Inno Setup installer, copies it to `Releases/<version>/`, and optionally publishes a GitHub release.
 
 ### Tests
 
