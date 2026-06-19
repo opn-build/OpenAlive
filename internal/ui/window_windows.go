@@ -159,7 +159,7 @@ func New(deps Deps) (*Window, error) {
 func version() string { return appVersion }
 
 // appVersion is set by the main package at startup.
-var appVersion = "1.1.0"
+var appVersion = "1.2.0"
 
 // SetVersion overrides the version shown in the title bar.
 func SetVersion(v string) {
