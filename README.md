@@ -1,5 +1,11 @@
 # OpenAlive
 
+<p align="center">
+  <a href="https://opn-build.github.io/">
+    <img src="https://opn-build.github.io/og-image.png" alt="OpenAlive — Keep your PC alive" width="600" />
+  </a>
+</p>
+
 > Keep your PC active. Automatically.
 
 **[Website](https://opn-build.github.io/) · [Download](https://github.com/opn-build/OpenAlive/releases) · [License](LICENSE)**
