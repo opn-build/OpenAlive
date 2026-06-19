@@ -134,6 +134,11 @@ func New(deps Deps) (*Window, error) {
 		return nil, err
 	}
 
+	// Remove the maximize button; the fixed-size window has no use for it.
+	hwnd := w.mw.Handle()
+	style := win.GetWindowLong(hwnd, win.GWL_STYLE)
+	win.SetWindowLong(hwnd, win.GWL_STYLE, style&^win.WS_MAXIMIZEBOX)
+
 	if ic, err := walk.NewIconFromImage(icons.AppIcon()); err == nil {
 		_ = w.mw.SetIcon(ic)
 	}
