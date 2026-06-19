@@ -6,7 +6,7 @@
 
 OpenAlive prevents your workstation from going idle by simulating subtle mouse movements and optional keystrokes at configurable intervals — so your status stays green and your screen stays on while you work.
 
-No installation of runtimes required. Single `.exe`, ~6 MB, ~5–15 MB of RAM at idle.
+No installation of runtimes required. Single `.exe`, ~6.5 MB, ~5–15 MB of RAM at idle.
 
 ---
 
