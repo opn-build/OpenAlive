@@ -2,9 +2,17 @@
 
 > Keep your PC active. Automatically.
 
+**[Website](https://opn-build.github.io/) · [Download](https://github.com/opn-build/OpenAlive/releases) · [License](LICENSE)**
+
 OpenAlive prevents your workstation from going idle by simulating subtle mouse movements and optional keystrokes at configurable intervals — so your status stays green and your screen stays on while you work.
 
 No installation of runtimes required. Single `.exe`, ~6 MB, ~5–15 MB of RAM at idle.
+
+---
+
+## Why OpenAlive?
+
+Working remotely or in a monitored environment, your PC going to sleep or showing "Away" on Teams/Slack breaks your workflow. OpenAlive keeps Windows 10 and Windows 11 awake without requiring admin rights, installing drivers, or using physical mouse jigglers. It runs silently in the system tray, respects your work schedule, and collects zero telemetry.
 
 ---
 
@@ -27,9 +35,9 @@ No installation of runtimes required. Single `.exe`, ~6 MB, ~5–15 MB of RAM at
 ## Screenshots
 
 <p align="center">
-  <img src="https://opn-build.github.io/images/01-status.jpg" width="320" alt="Status tab" />
-  <img src="https://opn-build.github.io/images/02-schedule.jpg" width="320" alt="Schedule tab" />
-  <img src="https://opn-build.github.io/images/03-settings.jpg" width="320" alt="Settings tab" />
+  <img src="https://opn-build.github.io/images/01-status.jpg" width="320" alt="OpenAlive Status tab — activity toggle and live log" />
+  <img src="https://opn-build.github.io/images/02-schedule.jpg" width="320" alt="OpenAlive Schedule tab — work hours and lunch break configuration" />
+  <img src="https://opn-build.github.io/images/03-settings.jpg" width="320" alt="OpenAlive Settings tab — movement interval, keystroke and language options" />
 </p>
 
 ---
@@ -77,6 +85,12 @@ go vet ./...
 ```
 
 </details>
+
+---
+
+## Privacy
+
+OpenAlive runs entirely on your machine. It makes no network requests, sends no telemetry, and stores no personal data. All configuration is saved locally in `%APPDATA%\OpenAlive\config.json`.
 
 ---
 
