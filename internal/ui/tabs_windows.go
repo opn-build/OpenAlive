@@ -292,7 +292,7 @@ func (w *Window) saveSchedule() bool {
 	le, ok4 := parseHHMM(w.lunchEnd.Text())
 
 	if !ok1 || !ok2 {
-		w.showSchedMsg(i18n.T("schedule.invalid_time", map[string]string{"key": "work"}), false)
+		w.showSchedMsg(i18n.T("schedule.invalid_time", "key", "work"), false)
 		return false
 	}
 	if we <= ws {
@@ -301,7 +301,7 @@ func (w *Window) saveSchedule() bool {
 	}
 	if w.lunchEnable.Checked() {
 		if !ok3 || !ok4 {
-			w.showSchedMsg(i18n.T("schedule.invalid_time", map[string]string{"key": "lunch"}), false)
+			w.showSchedMsg(i18n.T("schedule.invalid_time", "key", "lunch"), false)
 			return false
 		}
 		if le <= ls {

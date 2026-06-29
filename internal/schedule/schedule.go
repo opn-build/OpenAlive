@@ -4,6 +4,7 @@ package schedule
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 	"time"
 
@@ -90,13 +91,13 @@ func (s *Scheduler) NextEvent(status string) string {
 			}
 			mins := int(nxt.Sub(now).Minutes())
 			h, m := mins/60, mins%60
-			return i18n.T("sched.work_starts", map[string]string{"h": itoa(h), "m": itoa(m)})
+			return i18n.T("sched.work_starts", "h", strconv.Itoa(h), "m", strconv.Itoa(m))
 		}
 
 	case StatusLunch:
 		if le, ok := parseTime(c.LunchEnd); ok {
 			m := minutesUntil(now, atDate(now, le))
-			return i18n.T("sched.lunch_ends", map[string]string{"m": itoa(m)})
+			return i18n.T("sched.lunch_ends", "m", strconv.Itoa(m))
 		}
 
 	case StatusActive:
@@ -106,13 +107,13 @@ func (s *Scheduler) NextEvent(status string) string {
 		if c.LunchEnabled && beforeLunch(c) {
 			if ls, ok := parseTime(c.LunchStart); ok {
 				m := minutesUntil(now, atDate(now, ls))
-				return i18n.T("sched.lunch_in", map[string]string{"m": itoa(m)})
+				return i18n.T("sched.lunch_in", "m", strconv.Itoa(m))
 			}
 		}
 		if we, ok := parseTime(c.WorkEnd); ok {
 			mins := minutesUntil(now, atDate(now, we))
 			h, m := mins/60, mins%60
-			return i18n.T("sched.work_ends", map[string]string{"h": itoa(h), "m": itoa(m)})
+			return i18n.T("sched.work_ends", "h", strconv.Itoa(h), "m", strconv.Itoa(m))
 		}
 	}
 	return "—"
@@ -177,5 +178,3 @@ func minutesUntil(now, target time.Time) int {
 	}
 	return d
 }
-
-func itoa(n int) string { return fmt.Sprintf("%d", n) }

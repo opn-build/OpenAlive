@@ -65,11 +65,19 @@ type Window struct {
 	nextEventLbl    *walk.Label
 	scheduleSummLbl *walk.Label
 
+	// cached GDI brushes — created once in New, disposed in Exit
+	badgeBrushActive   *walk.SolidColorBrush
+	badgeBrushPaused   *walk.SolidColorBrush
+	badgeBrushInactive *walk.SolidColorBrush
+	logBgBrush         *walk.SolidColorBrush
+	logHlBrush         *walk.SolidColorBrush
+
 	// terminal log widget (3 lines: prev / current / next)
 	logWidget      *walk.CustomWidget
 	logPrev        string
 	logCurrent     string
 	logNext        string
+	logNextLine    string     // "→ " + logNext, pre-built in UpdateStatus
 	logFont        *walk.Font // Consolas 9
 	logHeaderFont  *walk.Font // Segoe UI 8
 
@@ -143,6 +151,23 @@ func New(deps Deps) (*Window, error) {
 		_ = w.mw.SetIcon(ic)
 	}
 
+	// Create GDI brushes once; reused on every WM_PAINT instead of alloc+dispose.
+	if b, err := walk.NewSolidColorBrush(walk.RGB(39, 174, 96)); err == nil {
+		w.badgeBrushActive = b
+	}
+	if b, err := walk.NewSolidColorBrush(walk.RGB(230, 126, 34)); err == nil {
+		w.badgeBrushPaused = b
+	}
+	if b, err := walk.NewSolidColorBrush(walk.RGB(192, 57, 43)); err == nil {
+		w.badgeBrushInactive = b
+	}
+	if b, err := walk.NewSolidColorBrush(walk.RGB(10, 14, 10)); err == nil {
+		w.logBgBrush = b
+	}
+	if b, err := walk.NewSolidColorBrush(walk.RGB(15, 45, 15)); err == nil {
+		w.logHlBrush = b
+	}
+
 	w.badgeState = "inactive"
 	w.schedStatus = schedule.StatusManualOff
 	if f, err := walk.NewFont("Segoe UI", 13, walk.FontBold); err == nil {
@@ -195,6 +220,14 @@ func (w *Window) Hide() { w.mw.Hide() }
 
 // Exit allows the next close to proceed and terminates the message loop.
 func (w *Window) Exit() {
+	for _, b := range []*walk.SolidColorBrush{
+		w.badgeBrushActive, w.badgeBrushPaused, w.badgeBrushInactive,
+		w.logBgBrush, w.logHlBrush,
+	} {
+		if b != nil {
+			b.Dispose()
+		}
+	}
 	w.allowExit = true
 	select {
 	case <-w.done:
@@ -245,9 +278,7 @@ func (w *Window) wireEvents() {
 		}
 		_ = w.deps.OnToggle()
 		w.refresh() // updates w.schedStatus to actual scheduler state
-		w.AddLog(i18n.T("status.toggle_log", map[string]string{
-			"label": i18n.T("status.label." + w.schedStatus),
-		}))
+		w.AddLog(i18n.T("status.toggle_log", "label", i18n.T("status.label."+w.schedStatus)))
 	})
 }
 
@@ -280,7 +311,7 @@ func (w *Window) onTabChanged() {
 	w.setIndexGuarded(prev)
 
 	title := i18n.T("dialog.unsaved_title")
-	msg := i18n.T("dialog.unsaved_msg", map[string]string{"tab": tabTitle(prev)})
+	msg := i18n.T("dialog.unsaved_msg", "tab", tabTitle(prev))
 	if walk.MsgBox(w.mw, title, msg, walk.MsgBoxYesNo|walk.MsgBoxIconQuestion) == win.IDYES {
 		if !w.saveAt(prev) {
 			return // validation failed -> stay on the dirty tab
@@ -357,7 +388,8 @@ func (w *Window) refresh() {
 func (w *Window) UpdateStatus(status, nextEvent string) {
 	w.refreshBadge(status)
 	w.logNext = nextEvent
-	_ = w.nextEventLbl.SetText(i18n.T("status.next_event", map[string]string{"event": nextEvent}))
+	w.logNextLine = "→ " + nextEvent
+	_ = w.nextEventLbl.SetText(i18n.T("status.next_event", "event", nextEvent))
 	w.updateScheduleSummary()
 	if w.logWidget != nil {
 		w.logWidget.Invalidate()
@@ -381,20 +413,18 @@ func (w *Window) refreshBadge(status string) {
 
 func (w *Window) paintBadge(canvas *walk.Canvas, _ walk.Rectangle) error {
 	bounds := w.statusBadge.ClientBounds()
-	var bg walk.Color
+	var brush *walk.SolidColorBrush
 	switch w.badgeState {
 	case "active":
-		bg = walk.RGB(39, 174, 96)
+		brush = w.badgeBrushActive
 	case "schedule-paused":
-		bg = walk.RGB(230, 126, 34)
+		brush = w.badgeBrushPaused
 	default:
-		bg = walk.RGB(192, 57, 43)
+		brush = w.badgeBrushInactive
 	}
-	brush, err := walk.NewSolidColorBrush(bg)
-	if err != nil {
-		return err
+	if brush == nil {
+		return nil
 	}
-	defer brush.Dispose()
 	if err := canvas.FillRectangle(brush, bounds); err != nil {
 		return err
 	}
@@ -411,12 +441,9 @@ func (w *Window) paintLog(canvas *walk.Canvas, _ walk.Rectangle) error {
 	}
 	b := w.logWidget.ClientBounds()
 
-	bg, err := walk.NewSolidColorBrush(walk.RGB(10, 14, 10))
-	if err != nil {
-		return err
+	if w.logBgBrush != nil {
+		_ = canvas.FillRectangle(w.logBgBrush, b)
 	}
-	defer bg.Dispose()
-	_ = canvas.FillRectangle(bg, b)
 
 	if w.logHeaderFont == nil || w.logFont == nil {
 		return nil
@@ -437,10 +464,8 @@ func (w *Window) paintLog(canvas *walk.Canvas, _ walk.Rectangle) error {
 	}
 
 	// Current (highlight row — phosphor green)
-	hlBrush, err := walk.NewSolidColorBrush(walk.RGB(15, 45, 15))
-	if err == nil {
-		_ = canvas.FillRectangle(hlBrush, walk.Rectangle{X: 0, Y: 41, Width: b.Width, Height: lineH})
-		hlBrush.Dispose()
+	if w.logHlBrush != nil {
+		_ = canvas.FillRectangle(w.logHlBrush, walk.Rectangle{X: 0, Y: 41, Width: b.Width, Height: lineH})
 	}
 	if cur := w.logCurrent; cur != "" {
 		_ = canvas.DrawText(cur, w.logFont, walk.RGB(57, 255, 20),
@@ -449,8 +474,8 @@ func (w *Window) paintLog(canvas *walk.Canvas, _ walk.Rectangle) error {
 	}
 
 	// Next event (medium green)
-	if w.logNext != "" {
-		_ = canvas.DrawText("→ "+w.logNext, w.logFont, walk.RGB(77, 176, 77),
+	if w.logNextLine != "" {
+		_ = canvas.DrawText(w.logNextLine, w.logFont, walk.RGB(77, 176, 77),
 			walk.Rectangle{X: pad, Y: 60, Width: b.Width - pad*2, Height: lineH},
 			walk.TextSingleLine|walk.TextVCenter)
 	}

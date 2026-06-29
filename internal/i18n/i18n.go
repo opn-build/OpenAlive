@@ -9,7 +9,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"strings"
-	"sync"
+	"sync/atomic"
 )
 
 //go:embed strings.json
@@ -20,11 +20,11 @@ var stringsJSON []byte
 var (
 	table   map[string]map[string]string
 	order   = []string{"es", "en", "pt-BR", "fr", "ja", "zh-CN", "ko", "ht"}
-	current = "en"
-	mu      sync.RWMutex
+	current atomic.Value // stores string
 )
 
 func init() {
+	current.Store("en")
 	if err := json.Unmarshal(stringsJSON, &table); err != nil {
 		// A malformed embedded table is a build-time bug; degrade to empty so
 		// the app still runs (keys echo back) instead of panicking at startup.
@@ -38,29 +38,21 @@ func Available() []string { return append([]string(nil), order...) }
 // SetLang selects the active language. An empty or unknown code falls back to
 // English, mirroring lang.set_lang in the Python app.
 func SetLang(code string) {
-	mu.Lock()
-	defer mu.Unlock()
 	if _, ok := table[code]; ok {
-		current = code
+		current.Store(code)
 		return
 	}
-	current = "en"
+	current.Store("en")
 }
 
 // Lang returns the active language code.
-func Lang() string {
-	mu.RLock()
-	defer mu.RUnlock()
-	return current
-}
+func Lang() string { return current.Load().(string) }
 
 // T returns the localized string for key, with {placeholder} substitution from
-// the args map. Falls back to English, then to the raw key, so the UI never
-// shows blanks.
-func T(key string, args ...map[string]string) string {
-	mu.RLock()
-	lang := current
-	mu.RUnlock()
+// alternating key/value pairs in args. Falls back to English, then to the raw
+// key, so the UI never shows blanks.
+func T(key string, args ...string) string {
+	lang := current.Load().(string)
 
 	s, ok := table[lang][key]
 	if !ok {
@@ -68,10 +60,8 @@ func T(key string, args ...map[string]string) string {
 			s = key
 		}
 	}
-	if len(args) > 0 {
-		for k, v := range args[0] {
-			s = strings.ReplaceAll(s, "{"+k+"}", v)
-		}
+	for i := 0; i+1 < len(args); i += 2 {
+		s = strings.ReplaceAll(s, "{"+args[i]+"}", args[i+1])
 	}
 	return s
 }

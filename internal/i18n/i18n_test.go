@@ -15,7 +15,7 @@ func TestEmbeddedTableLoads(t *testing.T) {
 
 func TestSubstitutionAndFallback(t *testing.T) {
 	SetLang("en")
-	if got := T("status.state", map[string]string{"label": "Active"}); got != "Status: Active" {
+	if got := T("status.state", "label", "Active"); got != "Status: Active" {
 		t.Errorf("substitution failed: %q", got)
 	}
 

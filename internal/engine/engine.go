@@ -8,8 +8,8 @@ package engine
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
+	"strconv"
 	"sync"
 	"time"
 
@@ -77,6 +77,7 @@ func (e *Engine) loop(ctx context.Context) {
 	var nextActionAt time.Time // zero => act on first active tick
 
 	check := func() {
+		now := time.Now()
 		status := e.sched.Status()
 		if status != e.lastStatus {
 			e.lastStatus = status
@@ -84,7 +85,7 @@ func (e *Engine) loop(ctx context.Context) {
 				e.onStatusChange(status)
 			}
 		}
-		if status == schedule.StatusActive && !time.Now().Before(nextActionAt) {
+		if status == schedule.StatusActive && !now.Before(nextActionAt) {
 			e.performAction()
 			interval := e.cfg.Snapshot().MouseIntervalSeconds
 			if interval < 5 {
@@ -133,14 +134,11 @@ func (e *Engine) performAction() {
 	if c.KeystrokeEnabled {
 		if vk, ok := winput.VKCodes[c.KeystrokeKey]; ok {
 			winput.TapKey(vk)
-			keyInfo = " " + i18n.T("engine.key_action", map[string]string{"key": c.KeystrokeKey})
+			keyInfo = " " + i18n.T("engine.key_action", "key", c.KeystrokeKey)
 		}
 	}
 
-	e.emit("action", i18n.T("engine.mouse_action", map[string]string{
-		"px":    fmt.Sprintf("%d", pixels),
-		"extra": keyInfo,
-	}))
+	e.emit("action", i18n.T("engine.mouse_action", "px", strconv.Itoa(pixels), "extra", keyInfo))
 }
 
 func (e *Engine) emit(kind, msg string) {
