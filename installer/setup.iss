@@ -3,7 +3,7 @@
 ; The Go build is a single native exe (no runtime, no onedir folder).
 
 #define AppName      "OpenAlive"
-#define AppVersion   "1.2.0.1"
+#define AppVersion   "1.2.1"
 #define AppPublisher "opn-build"
 #define AppURL       "https://github.com/opn-build/OpenAlive-Releases"
 #define AppExeName   "OpenAlive.exe"

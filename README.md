@@ -94,6 +94,23 @@ go vet ./...
 
 ---
 
+## Changelog
+
+### v1.2.1
+- Performance: GDI brushes cached as Window fields — eliminates per-paint kernel alloc/dispose
+- Performance: lock-free i18n via `atomic.Value` (no mutex on the 26-call hot path)
+- Performance: `strconv.Itoa` replaces `fmt.Sprintf` for int→string in the activity loop
+- Code: `i18n.T()` now takes variadic string pairs instead of `map[string]string`
+
+### v1.2.0
+- Window no longer has a maximize button
+- Common Controls v6 manifest correctly embedded in binary (fixes startup crash on clean installs)
+
+### v1.1.0
+- Initial public release
+
+---
+
 ## Privacy
 
 OpenAlive runs entirely on your machine. It makes no network requests, sends no telemetry, and stores no personal data. All configuration is saved locally in `%APPDATA%\OpenAlive\config.json`.

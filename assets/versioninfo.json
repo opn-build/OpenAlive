@@ -1,7 +1,7 @@
 {
   "FixedFileInfo": {
-    "FileVersion": { "Major": 1, "Minor": 2, "Patch": 0, "Build": 1 },
-    "ProductVersion": { "Major": 1, "Minor": 2, "Patch": 0, "Build": 1 },
+    "FileVersion": { "Major": 1, "Minor": 2, "Patch": 1, "Build": 0 },
+    "ProductVersion": { "Major": 1, "Minor": 2, "Patch": 1, "Build": 0 },
     "FileFlagsMask": "3f",
     "FileFlags": "00",
     "FileOS": "040004",
@@ -11,12 +11,12 @@
   "StringFileInfo": {
     "CompanyName": "OpenAlive",
     "FileDescription": "OpenAlive — keeps your session active",
-    "FileVersion": "1.2.0.1",
+    "FileVersion": "1.2.1.0",
     "InternalName": "openalive.exe",
     "LegalCopyright": "OpenAlive",
     "OriginalFilename": "openalive.exe",
     "ProductName": "OpenAlive",
-    "ProductVersion": "1.2.0.1"
+    "ProductVersion": "1.2.1.0"
   },
   "VarFileInfo": {
     "Translation": { "LangID": "0409", "CharsetID": "04B0" }
