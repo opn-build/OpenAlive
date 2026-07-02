@@ -37,24 +37,34 @@ GOOS=windows GOARCH=amd64 "$GO" build \
 echo "    build/OpenAlive.exe OK"
 
 # 4. Inno Setup (ISCC.exe called from WSL via Windows path)
-echo "[3/4] Inno Setup..."
+echo "[3/5] Inno Setup..."
 "$ISCC" "$(wslpath -w "$ROOT/installer/setup.iss")"
 INSTALLER="$ROOT/installer/Output/OpenAlive_Setup_v$VERSION.exe"
 [ -f "$INSTALLER" ] || { echo "ERROR: installer not found: $INSTALLER"; exit 1; }
 echo "    installer/Output/OpenAlive_Setup_v${VERSION}.exe OK"
 
-# 5. Copy to Releases/<version>/
-echo "[4/4] Copying to Releases/$VERSION/..."
+# 5. Portable zip (just the standalone exe — config.json is created next to it on first run)
+echo "[4/5] Portable zip..."
+PORTABLE_ZIP="$ROOT/installer/Output/OpenAlive_Portable_v${VERSION}.zip"
+rm -f "$PORTABLE_ZIP"
+(cd "$ROOT/build" && zip -j "$PORTABLE_ZIP" OpenAlive.exe)
+echo "    installer/Output/OpenAlive_Portable_v${VERSION}.zip OK"
+
+# 6. Copy to Releases/<version>/
+echo "[5/5] Copying to Releases/$VERSION/..."
 RELEASE_DIR="$ROOT/Releases/$VERSION"
 mkdir -p "$RELEASE_DIR"
-cp "$INSTALLER" "$RELEASE_DIR/"
+cp "$INSTALLER" "$PORTABLE_ZIP" "$RELEASE_DIR/"
 echo "    Releases/$VERSION/OpenAlive_Setup_v${VERSION}.exe OK"
+echo "    Releases/$VERSION/OpenAlive_Portable_v${VERSION}.zip OK"
 
-# 6. GitHub release (optional)
+# 7. GitHub release (optional)
 echo ""
 read -rp "Create GitHub release v$VERSION on opn-build/OpenAlive? (y/N) " answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
-    gh release create "v$VERSION" "$RELEASE_DIR/OpenAlive_Setup_v$VERSION.exe" \
+    gh release create "v$VERSION" \
+        "$RELEASE_DIR/OpenAlive_Setup_v$VERSION.exe" \
+        "$RELEASE_DIR/OpenAlive_Portable_v$VERSION.zip" \
         --repo opn-build/OpenAlive \
         --title "OpenAlive v$VERSION" \
         --notes "See README.md Changelog for details."
@@ -65,3 +75,4 @@ fi
 
 echo ""
 echo "==> Done! Installer at Releases/$VERSION/OpenAlive_Setup_v${VERSION}.exe"
+echo "==> Done! Portable zip at Releases/$VERSION/OpenAlive_Portable_v${VERSION}.zip"

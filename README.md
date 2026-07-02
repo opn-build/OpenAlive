@@ -50,9 +50,9 @@ Working remotely or in a monitored environment, your PC going to sleep or showin
 
 ## Download
 
-Get the latest installer from the [Releases](https://github.com/opn-build/OpenAlive/releases) page.
+Get the latest installer — or a portable `.zip` if you'd rather not install anything — from the [Releases](https://github.com/opn-build/OpenAlive/releases) page.
 
-Run the installer, launch OpenAlive, and it will appear in your system tray.
+Run the installer, launch OpenAlive, and it will appear in your system tray. The portable build works the same way: unzip anywhere (including a USB drive), run `OpenAlive.exe`, and it will create its `config.json` right next to itself.
 
 ---
 
@@ -121,7 +121,7 @@ go vet ./...
 
 ## Privacy
 
-OpenAlive runs entirely on your machine. It makes no network requests, sends no telemetry, and stores no personal data. All configuration is saved locally in `%APPDATA%\OpenAlive\config.json`.
+OpenAlive runs entirely on your machine. It makes no network requests, sends no telemetry, and stores no personal data. All configuration is saved locally in `config.json`, next to the executable — so a portable copy stays fully self-contained.
 
 ---
 
