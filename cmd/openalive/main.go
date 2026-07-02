@@ -7,8 +7,6 @@ package main
 
 import (
 	"os"
-	"syscall"
-	"unsafe"
 
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
@@ -22,7 +20,7 @@ import (
 )
 
 // Version is the app version shown in the title bar and installer.
-const Version = "1.2.1"
+const Version = "1.3.0"
 
 const runKeyPath = `Software\Microsoft\Windows\CurrentVersion\Run`
 
@@ -186,18 +184,14 @@ func (a *App) setAutostart(enabled bool) error {
 // ── Single instance ──────────────────────────────────────────────────────────
 
 func alreadyRunning() bool {
-	kernel32 := windows.NewLazySystemDLL("kernel32.dll")
-	createMutex := kernel32.NewProc("CreateMutexW")
-	name, _ := syscall.UTF16PtrFromString("OpenAliveSingleInstance_v1")
-	_, _, err := createMutex.Call(0, 0, uintptr(unsafe.Pointer(name)))
+	name, _ := windows.UTF16PtrFromString("OpenAliveSingleInstance_v1")
+	_, err := windows.CreateMutex(nil, false, name)
 	return err == windows.ERROR_ALREADY_EXISTS
 }
 
 func messageBox(title, text string) {
-	user32 := windows.NewLazySystemDLL("user32.dll")
-	mb := user32.NewProc("MessageBoxW")
-	t, _ := syscall.UTF16PtrFromString(text)
-	c, _ := syscall.UTF16PtrFromString(title)
+	t, _ := windows.UTF16PtrFromString(text)
+	c, _ := windows.UTF16PtrFromString(title)
 	const mbIconInformation = 0x40
-	mb.Call(0, uintptr(unsafe.Pointer(t)), uintptr(unsafe.Pointer(c)), mbIconInformation)
+	_, _ = windows.MessageBox(0, t, c, mbIconInformation)
 }

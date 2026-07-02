@@ -22,6 +22,7 @@ import (
 const (
 	pollInterval = 2 * time.Second       // status poll cadence
 	moveDwell    = 80 * time.Millisecond // pause between out/back move
+	startupDelay = 5 * time.Second       // delay before the first action, so it isn't jarringly instant
 )
 
 // Engine drives mouse/keyboard activity according to the scheduler.
@@ -74,7 +75,7 @@ func (e *Engine) loop(ctx context.Context) {
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()
 
-	var nextActionAt time.Time // zero => act on first active tick
+	nextActionAt := time.Now().Add(startupDelay) // don't act until startupDelay has passed
 
 	check := func() {
 		now := time.Now()
@@ -95,7 +96,7 @@ func (e *Engine) loop(ctx context.Context) {
 		}
 	}
 
-	check() // act on startup without waiting a full tick
+	check() // detect status on startup without waiting a full tick; won't act until startupDelay elapses
 	for {
 		select {
 		case <-ctx.Done():

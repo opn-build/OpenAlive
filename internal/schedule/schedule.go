@@ -89,15 +89,12 @@ func (s *Scheduler) NextEvent(status string) string {
 			if !nxt.After(now) {
 				nxt = nxt.AddDate(0, 0, 1)
 			}
-			mins := int(nxt.Sub(now).Minutes())
-			h, m := mins/60, mins%60
-			return i18n.T("sched.work_starts", "h", strconv.Itoa(h), "m", strconv.Itoa(m))
+			return timeMessage("sched.work_starts", int(nxt.Sub(now).Minutes()))
 		}
 
 	case StatusLunch:
 		if le, ok := parseTime(c.LunchEnd); ok {
-			m := minutesUntil(now, atDate(now, le))
-			return i18n.T("sched.lunch_ends", "m", strconv.Itoa(m))
+			return timeMessage("sched.lunch_ends", minutesUntil(now, atDate(now, le)))
 		}
 
 	case StatusActive:
@@ -106,17 +103,24 @@ func (s *Scheduler) NextEvent(status string) string {
 		}
 		if c.LunchEnabled && beforeLunch(c) {
 			if ls, ok := parseTime(c.LunchStart); ok {
-				m := minutesUntil(now, atDate(now, ls))
-				return i18n.T("sched.lunch_in", "m", strconv.Itoa(m))
+				return timeMessage("sched.lunch_in", minutesUntil(now, atDate(now, ls)))
 			}
 		}
 		if we, ok := parseTime(c.WorkEnd); ok {
-			mins := minutesUntil(now, atDate(now, we))
-			h, m := mins/60, mins%60
-			return i18n.T("sched.work_ends", "h", strconv.Itoa(h), "m", strconv.Itoa(m))
+			return timeMessage("sched.work_ends", minutesUntil(now, atDate(now, we)))
 		}
 	}
 	return "—"
+}
+
+// timeMessage humanizes a minute count under baseKey, dropping the hours
+// component when it's zero (baseKey+"_m") instead of always showing "0h Xm".
+func timeMessage(baseKey string, mins int) string {
+	h, m := mins/60, mins%60
+	if h == 0 {
+		return i18n.T(baseKey+"_m", "m", strconv.Itoa(m))
+	}
+	return i18n.T(baseKey, "h", strconv.Itoa(h), "m", strconv.Itoa(m))
 }
 
 // ── helpers ────────────────────────────────────────────────────────────────

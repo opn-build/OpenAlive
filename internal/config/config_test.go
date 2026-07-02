@@ -33,8 +33,8 @@ func TestLoadMergesPartialOverDefaults(t *testing.T) {
 	if got.WorkStart != "08:00" {
 		t.Errorf("WorkStart = %q, want default 08:00", got.WorkStart)
 	}
-	if got.MouseIntervalSeconds != 10 {
-		t.Errorf("MouseIntervalSeconds = %d, want default 10", got.MouseIntervalSeconds)
+	if got.MouseIntervalSeconds != 30 {
+		t.Errorf("MouseIntervalSeconds = %d, want default 30", got.MouseIntervalSeconds)
 	}
 }
 

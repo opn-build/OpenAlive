@@ -134,9 +134,32 @@ func TestNextEventLunchIn(t *testing.T) {
 		c.ScheduleEnabled = true
 		c.LunchEnabled = true
 	}))
-	// English fallback text contains the minutes; just assert it mentions 30.
-	if got := s.NextEvent(s.Status()); got == "" || got == "—" {
-		t.Fatalf("NextEvent = %q, want a lunch-in message", got)
+	if got, want := s.NextEvent(s.Status()), "Lunch in 30 min"; got != want {
+		t.Fatalf("NextEvent = %q, want %q", got, want)
+	}
+}
+
+func TestNextEventLunchInOverAnHour(t *testing.T) {
+	fixedClock(t, 8, 39) // 4h21m before lunch at 13:00, within work hours (08:00-18:00)
+	s := New(newStore(t, func(c *config.Config) {
+		c.StartActive = true
+		c.ScheduleEnabled = true
+		c.LunchEnabled = true
+	}))
+	if got, want := s.NextEvent(s.Status()), "Lunch in 4h 21m"; got != want {
+		t.Fatalf("NextEvent = %q, want %q", got, want)
+	}
+}
+
+func TestNextEventLunchEnds(t *testing.T) {
+	fixedClock(t, 13, 30) // 30 min before lunch ends at 14:00
+	s := New(newStore(t, func(c *config.Config) {
+		c.StartActive = true
+		c.ScheduleEnabled = true
+		c.LunchEnabled = true
+	}))
+	if got, want := s.NextEvent(s.Status()), "Lunch ends in 30 min"; got != want {
+		t.Fatalf("NextEvent = %q, want %q", got, want)
 	}
 }
 

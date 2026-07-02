@@ -65,7 +65,8 @@ type Window struct {
 	nextEventLbl    *walk.Label
 	scheduleSummLbl *walk.Label
 
-	// cached GDI brushes — created once in New, disposed in Exit
+	// cached GDI resources — created once in New, disposed in Exit
+	windowIcon         *walk.Icon
 	badgeBrushActive   *walk.SolidColorBrush
 	badgeBrushPaused   *walk.SolidColorBrush
 	badgeBrushInactive *walk.SolidColorBrush
@@ -148,6 +149,7 @@ func New(deps Deps) (*Window, error) {
 	win.SetWindowLong(hwnd, win.GWL_STYLE, style&^win.WS_MAXIMIZEBOX)
 
 	if ic, err := walk.NewIconFromImage(icons.AppIcon()); err == nil {
+		w.windowIcon = ic
 		_ = w.mw.SetIcon(ic)
 	}
 
@@ -227,6 +229,14 @@ func (w *Window) Exit() {
 		if b != nil {
 			b.Dispose()
 		}
+	}
+	for _, f := range []*walk.Font{w.badgeFont, w.logFont, w.logHeaderFont} {
+		if f != nil {
+			f.Dispose()
+		}
+	}
+	if w.windowIcon != nil {
+		w.windowIcon.Dispose()
 	}
 	w.allowExit = true
 	select {

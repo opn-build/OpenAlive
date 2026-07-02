@@ -96,6 +96,14 @@ go vet ./...
 
 ## Changelog
 
+### v1.3.0
+- Fix: program icon embedded again in the compiled binary (`build_release.sh` was missing the `goversioninfo -icon` flag)
+- Fix: `app.manifest` version was stale since v1.1.0
+- UX: "next event" countdown now humanized (e.g. "8h 21m" / "30 min" instead of raw minutes)
+- UX: default `Action Interval` raised to 30s; first action now waits 5s instead of firing instantly on launch
+- UX: `Simulate key press` now defaults to disabled
+- Cleanup: GDI fonts/icons now released alongside brushes on exit; `main.go` uses typed `x/sys/windows` calls instead of manual syscalls
+
 ### v1.2.1
 - Performance: GDI brushes cached as Window fields — eliminates per-paint kernel alloc/dispose
 - Performance: lock-free i18n via `atomic.Value` (no mutex on the 26-call hot path)

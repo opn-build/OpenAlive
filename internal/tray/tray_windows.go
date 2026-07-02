@@ -91,9 +91,12 @@ func (t *Tray) Retranslate() {
 // IsActive reports whether the tray icon exists and can restore the window.
 func (t *Tray) IsActive() bool { return t != nil && t.ni != nil }
 
-// Dispose removes the tray icon.
+// Dispose removes the tray icon and releases the cached state icons.
 func (t *Tray) Dispose() {
 	if t.ni != nil {
 		_ = t.ni.Dispose()
+	}
+	for _, ic := range t.state {
+		ic.Dispose()
 	}
 }

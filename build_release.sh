@@ -23,6 +23,7 @@ echo ""
 echo "[1/4] goversioninfo..."
 "$GVI" \
     -manifest "$ROOT/assets/app.manifest" \
+    -icon "$ROOT/assets/icon.ico" \
     -o "$ROOT/cmd/openalive/resource_windows_amd64.syso" \
     "$ROOT/assets/versioninfo.json"
 echo "    resource_windows_amd64.syso OK"
