@@ -215,6 +215,7 @@ func (w *Window) Show() {
 	w.mw.Show()
 	_ = w.mw.Activate()
 	win.SetForegroundWindow(h)
+	w.refresh() // the periodic refresh pauses while hidden; catch up on restore
 }
 
 // Hide removes the window (and its taskbar button).
@@ -383,7 +384,13 @@ func (w *Window) startRefreshLoop() {
 			case <-w.done:
 				return
 			case <-t.C:
-				w.SafeUpdate(w.refresh)
+				// Skip the refresh (and its paint/alloc work) while hidden in
+				// the tray; Show() refreshes immediately on restore.
+				w.SafeUpdate(func() {
+					if w.mw.Visible() {
+						w.refresh()
+					}
+				})
 			}
 		}
 	}()

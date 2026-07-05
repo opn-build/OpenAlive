@@ -3,12 +3,17 @@ package i18n
 import "testing"
 
 func TestEmbeddedTableLoads(t *testing.T) {
-	if len(table) != 8 {
-		t.Fatalf("expected 8 languages, got %d", len(table))
-	}
+	defer SetLang("en")
+	// Every advertised language must exist in the embedded JSON: SetLang only
+	// keeps the requested code when it parsed successfully, else it falls back
+	// to "en".
 	for _, lang := range order {
-		if _, ok := table[lang]; !ok {
-			t.Errorf("missing language %q in table", lang)
+		SetLang(lang)
+		if Lang() != lang {
+			t.Errorf("SetLang(%q) resolved to %q; language missing from strings.json", lang, Lang())
+		}
+		if tb := current.Load().(*table); len(tb.active) == 0 {
+			t.Errorf("language %q loaded an empty string table", lang)
 		}
 	}
 }

@@ -7,6 +7,7 @@ package main
 
 import (
 	"os"
+	"runtime/debug"
 
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
@@ -25,6 +26,11 @@ const Version = "1.3.0"
 const runKeyPath = `Software\Microsoft\Windows\CurrentVersion\Run`
 
 func main() {
+	// The app allocates almost nothing in steady state (one action every ≥5 s
+	// while idling in the tray); a low GC target keeps the heap tight for a
+	// negligible CPU cost.
+	debug.SetGCPercent(20)
+
 	if alreadyRunning() {
 		messageBox("OpenAlive", i18n.T("app.already_running"))
 		return
@@ -73,6 +79,10 @@ func (a *App) run() {
 	a.engine = engine.New(a.cfg, a.sched, a.onEngineAction, a.onEngineStatusChange)
 	a.engine.Start()
 	a.pushStatus()
+
+	// Startup is the allocation peak (walk widget creation, embedded-asset
+	// decoding); return that transient memory to the OS before settling in.
+	go debug.FreeOSMemory()
 
 	win.Show() // first launch shows the window (mirrors the Python app)
 	win.Run()  // blocks on walk's message loop until Exit
@@ -125,7 +135,12 @@ func (a *App) pushStatus() {
 	}
 }
 
+// notifyTrayHint runs whenever the window hides to the tray. That is the start
+// of the long idle stretch (and when users check the Task Manager), so shrink
+// the working set here; off the GUI thread to avoid a paint hitch.
 func (a *App) notifyTrayHint() {
+	go debug.FreeOSMemory()
+
 	if a.cfg.Snapshot().TrayHintShown {
 		return
 	}

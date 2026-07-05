@@ -30,7 +30,7 @@ echo "    resource_windows_amd64.syso OK"
 
 # 3. go build (cross-compile for Windows from WSL)
 echo "[2/4] go build..."
-GOOS=windows GOARCH=amd64 "$GO" build \
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 "$GO" build \
     -ldflags="-H=windowsgui -s -w" -trimpath \
     -o "$ROOT/build/OpenAlive.exe" \
     "$ROOT/cmd/openalive/"
