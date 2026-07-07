@@ -2,7 +2,10 @@
 
 <p align="center">
   <a href="https://opn-build.github.io/">
-    <img src="https://opn-build.github.io/og-image.png" alt="OpenAlive — Keep your PC alive" width="600" />
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="https://opn-build.github.io/og-image-light.png" />
+      <img src="https://opn-build.github.io/og-image.png" alt="OpenAlive — Keep your PC alive" width="600" />
+    </picture>
   </a>
 </p>
 
@@ -50,7 +53,11 @@ Working remotely or in a monitored environment, your PC going to sleep or showin
 
 ## Download
 
-Get the latest installer — or a portable `.zip` if you'd rather not install anything — from the [Releases](https://github.com/opn-build/OpenAlive/releases) page.
+**[⬇ Installer — OpenAlive_Setup_v1.3.0.exe](https://github.com/opn-build/OpenAlive/releases/download/v1.3.0/OpenAlive_Setup_v1.3.0.exe)** (3.7 MB)
+
+**[⬇ Portable — OpenAlive_Portable_v1.3.0.zip](https://github.com/opn-build/OpenAlive/releases/download/v1.3.0/OpenAlive_Portable_v1.3.0.zip)** (2.4 MB)
+
+Or browse all versions on the [Releases](https://github.com/opn-build/OpenAlive/releases) page.
 
 Run the installer, launch OpenAlive, and it will appear in your system tray. The portable build works the same way: unzip anywhere (including a USB drive), run `OpenAlive.exe`, and it will create its `config.json` right next to itself.
 
