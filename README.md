@@ -44,9 +44,9 @@ Working remotely or in a monitored environment, your PC going to sleep or showin
 ## Screenshots
 
 <p align="center">
-  <img src="https://opn-build.github.io/images/01-status.jpg" width="320" alt="OpenAlive Status tab — activity toggle and live log" />
-  <img src="https://opn-build.github.io/images/02-schedule.jpg" width="320" alt="OpenAlive Schedule tab — work hours and lunch break configuration" />
-  <img src="https://opn-build.github.io/images/03-settings.jpg" width="320" alt="OpenAlive Settings tab — movement interval, keystroke and language options" />
+  <img src="https://opn-build.github.io/images/01-status.png" width="320" alt="OpenAlive Status tab — activity toggle and live log" />
+  <img src="https://opn-build.github.io/images/02-schedule.png" width="320" alt="OpenAlive Schedule tab — work hours and lunch break configuration" />
+  <img src="https://opn-build.github.io/images/03-settings.png" width="320" alt="OpenAlive Settings tab — movement interval, keystroke and language options" />
 </p>
 
 ---
